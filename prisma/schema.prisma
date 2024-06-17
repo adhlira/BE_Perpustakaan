@@ -1,0 +1,134 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Petugas {
+  id           Int            @id @default(autoincrement())
+  username     String
+  password     String
+  nama         String
+  telp         String         @unique
+  Peminjaman   Peminjaman[]
+  Pengembalian Pengembalian[]
+
+  @@map("petugas")
+}
+
+model Anggota {
+  id            Int            @id @default(autoincrement())
+  nis           String         @unique
+  nama          String
+  jenis_kelamin String
+  telp          String         @unique
+  Peminjaman    Peminjaman[]
+  Pengembalian  Pengembalian[]
+
+  @@map("anggota")
+}
+
+model Pengarang {
+  id   Int    @id @default(autoincrement())
+  nama String
+  telp String @unique
+  Buku Buku[]
+
+  @@map("pengarang")
+}
+
+model Penerbit {
+  id     Int    @id @default(autoincrement())
+  nama   String
+  alamat String
+  Buku   Buku[]
+}
+
+model Rak {
+  id     Int    @id @default(autoincrement())
+  lokasi String
+  Buku   Buku[]
+
+  @@map("rak")
+}
+
+model Buku {
+  id           Int    @id @default(autoincrement())
+  pengarang_id Int
+  penerbit_id  Int
+  rak_id       Int
+  judul        String
+  tahun_terbit Int
+  jumlah       Int
+  isbn         String
+
+  Pengarang           Pengarang             @relation(fields: [pengarang_id], references: [id])
+  Penerbit            Penerbit              @relation(fields: [penerbit_id], references: [id])
+  Rak                 Rak                   @relation(fields: [rak_id], references: [id])
+  Detail_Peminjaman   Detail_Peminjaman[]
+  Detail_Pengembalian Detail_Pengembalian[]
+
+  @@map("buku")
+}
+
+model Peminjaman {
+  id              Int      @id @default(autoincrement())
+  anggota_id      Int
+  petugas_id      Int
+  tanggal_pinjam  DateTime
+  tanggal_kembali DateTime
+
+  Anggota           Anggota             @relation(fields: [anggota_id], references: [id])
+  Petugas           Petugas             @relation(fields: [petugas_id], references: [id])
+  Detail_Peminjaman Detail_Peminjaman[]
+  Pengembalian      Pengembalian[]
+
+  @@map("peminjaman")
+}
+
+model Detail_Peminjaman {
+  peminjaman_id Int
+  buku_id       Int
+
+  Peminjaman Peminjaman @relation(fields: [peminjaman_id], references: [id])
+  Buku       Buku       @relation(fields: [buku_id], references: [id])
+
+  @@id([peminjaman_id, buku_id])
+  @@map("detail_peminjaman")
+}
+
+model Pengembalian {
+  id                   Int      @id @default(autoincrement())
+  peminjaman_id        Int
+  anggota_id           Int
+  petugas_id           Int
+  tanggal_pengembalian DateTime
+  denda                Int
+
+  Peminjaman          Peminjaman            @relation(fields: [peminjaman_id], references: [id])
+  Anggota             Anggota               @relation(fields: [anggota_id], references: [id])
+  Petugas             Petugas               @relation(fields: [petugas_id], references: [id])
+  Detail_Pengembalian Detail_Pengembalian[]
+
+  @@map("pengembalian")
+}
+
+model Detail_Pengembalian {
+  pengembalian_id Int
+  buku_id         Int
+
+  Pengembalian Pengembalian @relation(fields: [pengembalian_id], references: [id])
+  Buku         Buku         @relation(fields: [buku_id], references: [id])
+
+  @@id([pengembalian_id, buku_id])
+  @@map("detail_pengembalian")
+}
