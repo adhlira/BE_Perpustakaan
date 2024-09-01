@@ -13,16 +13,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Petugas {
-  id           Int            @id @default(autoincrement())
-  username     String
-  password     String
-  nama         String
-  telp         String         @unique
+model Roles {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  User Users[]
+
+  @@map("roles")
+}
+
+model Users {
+  id       Int    @id @default(autoincrement())
+  role_id  Int
+  username String
+  password String
+  nama     String
+  telp     String @unique
+
+  Roles Roles @relation(fields: [role_id], references: [id])
+
   Peminjaman   Peminjaman[]
   Pengembalian Pengembalian[]
 
-  @@map("petugas")
+  @@map("users")
 }
 
 model Anggota {
@@ -83,12 +96,12 @@ model Buku {
 model Peminjaman {
   id              Int      @id @default(autoincrement())
   anggota_id      Int
-  petugas_id      Int
+  user_id         Int
   tanggal_pinjam  DateTime
   tanggal_kembali DateTime
 
   Anggota           Anggota             @relation(fields: [anggota_id], references: [id])
-  Petugas           Petugas             @relation(fields: [petugas_id], references: [id])
+  Users             Users               @relation(fields: [user_id], references: [id])
   Detail_Peminjaman Detail_Peminjaman[]
   Pengembalian      Pengembalian[]
 
@@ -110,13 +123,13 @@ model Pengembalian {
   id                   Int      @id @default(autoincrement())
   peminjaman_id        Int
   anggota_id           Int
-  petugas_id           Int
+  user_id              Int
   tanggal_pengembalian DateTime
   denda                Int
 
   Peminjaman          Peminjaman            @relation(fields: [peminjaman_id], references: [id])
   Anggota             Anggota               @relation(fields: [anggota_id], references: [id])
-  Petugas             Petugas               @relation(fields: [petugas_id], references: [id])
+  Users               Users                 @relation(fields: [user_id], references: [id])
   Detail_Pengembalian Detail_Pengembalian[]
 
   @@map("pengembalian")
