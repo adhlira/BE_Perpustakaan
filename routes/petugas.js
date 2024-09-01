@@ -36,6 +36,7 @@ router.post("/petugas", async (req, res) => {
 });
 
 router.put("/petugas/:id", async (req, res) => {
+  const { password, ...otherData } = req.body;
   if (isNaN(req.params.id)) {
     res.status(400).json({ message: "ID tidak diketahui" });
   } else {
@@ -43,7 +44,12 @@ router.put("/petugas/:id", async (req, res) => {
     if (!petugas) {
       res.status(404).json({ message: "Data petugas tidak ditemukan" });
     } else {
-      const petugas_terbaru = await prisma.petugas.update({ where: { id: +req.params.id }, data: req.body });
+      let updatedData = { ...otherData };
+      if (password) {
+        const hashedPassword = await bcrypt.hash(password, 10)
+        updatedData.password = hashedPassword
+      }
+      const petugas_terbaru = await prisma.petugas.update({ where: { id: +req.params.id }, data: updatedData });
       res.status(200).json({ message: "Data petugas berhasil di perbarui", petugas_terbaru });
     }
   }
