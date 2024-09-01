@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
 import { Router } from "express";
 
 const prisma = new PrismaClient();
@@ -28,7 +29,8 @@ router.post("/petugas", async (req, res) => {
   if (!req.body.username || !req.body.password || !req.body.nama || !req.body.telp) {
     res.status(400).json({ message: "Data tidak lengkap" });
   } else {
-    const petugas = await prisma.petugas.create({ data: { username, password, nama, telp } });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const petugas = await prisma.petugas.create({ data: { username, password: hashedPassword, nama, telp } });
     res.status(200).json({ message: "Berhasil menambahkan data petugas", petugas });
   }
 });
