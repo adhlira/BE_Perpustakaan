@@ -23,15 +23,15 @@ router.get("/petugas/:id", async (req, res) => {
   }
 });
 
-router.post("/petugas", async (req, res) => {
-  const { username, password, nama, telp } = req.body;
+router.post("/register", async (req, res) => {
+  const { role_id, username, password, nama, telp } = req.body;
 
-  if (!req.body.username || !req.body.password || !req.body.nama || !req.body.telp) {
+  if (!role_id || !username || !password || !nama || !telp) {
     res.status(400).json({ message: "Data tidak lengkap" });
   } else {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const petugas = await prisma.petugas.create({ data: { username, password: hashedPassword, nama, telp } });
-    res.status(200).json({ message: "Berhasil menambahkan data petugas", petugas });
+    const users = await prisma.users.create({ data: {role_id, username, password: hashedPassword, nama, telp } });
+    res.status(200).json({ message: "Berhasil menambahkan data Users", users });
   }
 });
 
