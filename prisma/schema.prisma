@@ -17,7 +17,8 @@ model Roles {
   id   Int    @id @default(autoincrement())
   name String
 
-  User Users[]
+  User           Users[]
+  PermissionRole PermissionRole[]
 
   @@map("roles")
 }
@@ -42,7 +43,7 @@ model Users {
 model Tokens {
   id        Int      @id @default(autoincrement())
   userId    Int
-  token     String
+  token     String   @unique
   expiredAt DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -158,4 +159,25 @@ model Detail_Pengembalian {
 
   @@id([pengembalian_id, buku_id])
   @@map("detail_pengembalian")
+}
+
+model Permission {
+  id             Int              @id @default(autoincrement())
+  name           String           @unique
+  created_at     DateTime         @default(now())
+  updated_at     DateTime         @updatedAt
+  PermissionRole PermissionRole[]
+
+  @@map("permissions")
+}
+
+model PermissionRole {
+  permission_id Int
+  role_id       Int
+
+  Permission Permission @relation(fields: [permission_id], references: [id])
+  Roles      Roles      @relation(fields: [role_id], references: [id])
+
+  @@id([permission_id, role_id])
+  @@map("permission_role")
 }

@@ -29,8 +29,8 @@ app.use(function (req, res, next) {
 
 app.options("*", cors());
 app.use(express.json());
-app.use(petugasRoute);
 app.use(loginRoute);
+app.use(petugasRoute);
 app.use(anggotaRoute);
 app.use(bukuRoute);
 app.use(pengarangRoute);
