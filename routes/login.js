@@ -17,8 +17,8 @@ router.post("/login", async (req, res) => {
   }
 
   try {
-    const expiresIn = "1h";
-    const expiredAt = new Date(Date.now() + 60 * 60 * 1000);
+    const expiresIn = "8h";
+    const expiredAt = new Date(Date.now() + 60 * 480 * 1000);
 
     const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn });
     await prisma.tokens.create({

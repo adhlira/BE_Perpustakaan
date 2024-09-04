@@ -14,7 +14,7 @@ router.get("/anggota", authorizePermission(Permission.BROWSE_ANGGOTA), async (re
   res.status(200).json(anggota);
 });
 
-router.get("/anggota/:id", async (req, res) => {
+router.get("/anggota/:id", authorizePermission(Permission.BROWSE_ANGGOTA), async (req, res) => {
   if (isNaN(req.params.id)) {
     res.status(400).json({ message: "ID anggota tidak diketahui" });
   } else {
@@ -27,32 +27,40 @@ router.get("/anggota/:id", async (req, res) => {
   }
 });
 
-router.post("/anggota", async (req, res) => {
+router.post("/anggota", authorizePermission(Permission.ADD_ANGGOTA), async (req, res) => {
   const { nis, nama, jenis_kelamin, telp } = req.body;
 
+  const anggota = await prisma.anggota.findFirst({ where: { nis: nis } });
+
+  if (anggota) {
+    return res.status(400).json({ message: "Nis sudah terdaftar" });
+  }
+
   if (!req.body.nis || !req.body.nama || !req.body.jenis_kelamin || !req.body.telp) {
-    res.status(400).json({ message: "Data tidak lengkap" });
+    return res.status(400).json({ message: "Data tidak lengkap" });
   } else {
     const petugas = await prisma.anggota.create({ data: { nis, nama, jenis_kelamin, telp } });
-    res.status(200).json({ message: "Berhasil menambahkan data petugas", petugas });
+    return res.status(200).json({ message: "Berhasil menambahkan data petugas", petugas });
   }
 });
 
-router.put("/anggota/:id", async (req, res) => {
+router.put("/anggota/:id", authorizePermission(Permission.UPDATE_ANGGOTA), async (req, res) => {
+  const { nis, nama, jenis_kelamin, telp } = req.body;
+
   if (isNaN(req.params.id)) {
-    res.status(400).json({ message: "ID tidak diketahui" });
+    res.status(400).json({ message: "ID unknown" });
   } else {
     const anggota = await prisma.anggota.findFirst({ where: { id: +req.params.id } });
     if (!anggota) {
-      res.status(404).json({ message: "Data anggota tidak ditemukan" });
+      res.status(404).json({ message: "Data tidak ditemukan" });
     } else {
-      const anggota_terbaru = await prisma.anggota.update({ where: { id: +req.params.id }, data: req.body });
-      res.status(200).json({ message: "Data anggota berhasil di perbarui", anggota_terbaru });
+      const updatedAnggota = await prisma.anggota.update({ where: { id: +req.params.id }, data: { nis, nama, jenis_kelamin, telp } });
+      res.status(200).json({ message: "Data berhasil di perbaharui", updatedAnggota });
     }
   }
 });
 
-router.delete("/anggota/:id", async (req, res) => {
+router.delete("/anggota/:id", authorizePermission(Permission.DELETE_ANGGOTA), async (req, res) => {
   if (isNaN(req.params.id)) {
     res.status(400).json({ message: "ID tidak di ketahui" });
   } else {

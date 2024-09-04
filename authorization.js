@@ -16,7 +16,17 @@ export const Permission = {
 };
 
 export const PermissionAssignment = {
-  [Role.ADMINISTRATOR]: [Permission.BROWSE_PETUGAS, Permission.ADD_PETUGAS, Permission.UPDATE_PETUGAS, Permission.DELETE_PETUGAS, Permission.BROWSE_ANGGOTA, Permission.ADD_ANGGOTA, Permission.UPDATE_ANGGOTA, Permission.DELETE_ANGGOTA],
+  [Role.ADMINISTRATOR]: [
+    Permission.BROWSE_PETUGAS, 
+    Permission.ADD_PETUGAS, 
+    Permission.UPDATE_PETUGAS, 
+    Permission.DELETE_PETUGAS, 
+
+    Permission.BROWSE_ANGGOTA,    
+    Permission.ADD_ANGGOTA, 
+    Permission.UPDATE_ANGGOTA, 
+    Permission.DELETE_ANGGOTA
+  ],
 
   [Role.REGULAR_USER]: [Permission.BROWSE_ANGGOTA, Permission.ADD_ANGGOTA],
 };
