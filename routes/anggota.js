@@ -1,11 +1,15 @@
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
+import { Permission } from "../authorization.js";
+import { authToken, authorizePermission } from "../middleware.js";
 
 const prisma = new PrismaClient();
 
 const router = Router();
 
-router.get("/anggota", async (req, res) => {
+router.use(authToken);
+
+router.get("/anggota", authorizePermission(Permission.BROWSE_ANGGOTA), async (req, res) => {
   const anggota = await prisma.anggota.findMany();
   res.status(200).json(anggota);
 });

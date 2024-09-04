@@ -9,12 +9,12 @@ const router = Router();
 
 router.use(authToken)
 
-router.get("/petugas", async (req, res) => {
+router.get("/petugas", authorizePermission(Permission.BROWSE_PETUGAS), async (req, res) => {
   const petugas = await prisma.users.findMany();
   res.status(200).json(petugas);
 });
 
-router.get("/petugas/:id", async (req, res) => {
+router.get("/petugas/:id",authorizePermission(Permission.BROWSE_PETUGAS), async (req, res) => {
   if (isNaN(req.params.id)) {
     res.status(400).json({ message: "ID tidak di ketahui" });
   } else {
@@ -27,7 +27,7 @@ router.get("/petugas/:id", async (req, res) => {
   }
 });
 
-router.post("/register", async (req, res) => {
+router.post("/register",authorizePermission(Permission.ADD_PETUGAS), async (req, res) => {
   const { role_id, username, password, nama, telp } = req.body;
 
   if (!role_id || !username || !password || !nama || !telp) {
@@ -59,7 +59,7 @@ router.put("/petugas/:id", authorizePermission(Permission.UPDATE_PETUGAS), async
   }
 });
 
-router.delete("/petugas/:id", async (req, res) => {
+router.delete("/petugas/:id", authorizePermission(Permission.DELETE_PETUGAS), async (req, res) => {
   if (isNaN(req.params.id)) {
     res.status(400).json({ message: "ID tidak di ketahui" });
   } else {
