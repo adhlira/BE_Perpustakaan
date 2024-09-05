@@ -39,8 +39,8 @@ router.post("/anggota", authorizePermission(Permission.ADD_ANGGOTA), async (req,
   if (!req.body.nis || !req.body.nama || !req.body.jenis_kelamin || !req.body.telp) {
     return res.status(400).json({ message: "Data tidak lengkap" });
   } else {
-    const petugas = await prisma.anggota.create({ data: { nis, nama, jenis_kelamin, telp } });
-    return res.status(200).json({ message: "Berhasil menambahkan data petugas", petugas });
+    const anggota_baru = await prisma.anggota.create({ data: { nis, nama, jenis_kelamin, telp } });
+    return res.status(200).json({ message: "Berhasil menambahkan data anggota baru", anggota_baru });
   }
 });
 
@@ -48,14 +48,20 @@ router.put("/anggota/:id", authorizePermission(Permission.UPDATE_ANGGOTA), async
   const { nis, nama, jenis_kelamin, telp } = req.body;
 
   if (isNaN(req.params.id)) {
-    res.status(400).json({ message: "ID unknown" });
+    return res.status(400).json({ message: "ID unknown" });
   } else {
     const anggota = await prisma.anggota.findFirst({ where: { id: +req.params.id } });
     if (!anggota) {
-      res.status(404).json({ message: "Data tidak ditemukan" });
+      return res.status(404).json({ message: "Data tidak ditemukan" });
     } else {
+      if (nis && nis !== anggota.nis) {
+        const duplikatNis = await prisma.anggota.findUnique({ where: { nis } });
+        if (duplikatNis) {
+          return res.status(400).json({ message: "Nis sudah terdaftar" });
+        }
+      }
       const updatedAnggota = await prisma.anggota.update({ where: { id: +req.params.id }, data: { nis, nama, jenis_kelamin, telp } });
-      res.status(200).json({ message: "Data berhasil di perbaharui", updatedAnggota });
+      return res.status(200).json({ message: "Data berhasil di perbaharui", updatedAnggota });
     }
   }
 });
