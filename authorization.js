@@ -13,6 +13,7 @@ export const Permission = {
   ADD_ANGGOTA: "add_anggota",
   UPDATE_ANGGOTA: "update_anggota",
   DELETE_ANGGOTA: "delete_anggota",
+  BORROWING_HISTORY: "borrowing_history"
 };
 
 export const PermissionAssignment = {
@@ -25,8 +26,9 @@ export const PermissionAssignment = {
     Permission.BROWSE_ANGGOTA,    
     Permission.ADD_ANGGOTA, 
     Permission.UPDATE_ANGGOTA, 
-    Permission.DELETE_ANGGOTA
+    Permission.DELETE_ANGGOTA,
+    Permission.BORROWING_HISTORY
   ],
 
-  [Role.REGULAR_USER]: [Permission.BROWSE_ANGGOTA, Permission.ADD_ANGGOTA],
+  [Role.REGULAR_USER]: [Permission.BROWSE_ANGGOTA, Permission.ADD_ANGGOTA, Permission.BORROWING_HISTORY],
 };

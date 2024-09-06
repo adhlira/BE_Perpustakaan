@@ -80,4 +80,33 @@ router.delete("/anggota/:id", authorizePermission(Permission.DELETE_ANGGOTA), as
   }
 });
 
+router.get("/borrowing_history/:id", authorizePermission(Permission.BORROWING_HISTORY), async (req, res) => {
+  if (isNaN(+req.params.id)) {
+    return res.status(400).json({ message: "Anggota tidak di ketahui" });
+  }
+  const anggota = await prisma.anggota.findUnique({ where: { id: +req.params.id } });
+  if (!anggota) {
+    return res.status(404).json({ message: "Anggota tidak di temukan" });
+  }
+  const borrowing_history = await prisma.anggota.findUnique({
+    where: { id: +req.params.id },
+    include: {
+      Peminjaman: {
+        include: {
+          Detail_Peminjaman: {
+            include: {
+              Buku: {
+                select: {
+                  judul: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+  return res.status(200).json(borrowing_history);
+});
+
 export default router;
