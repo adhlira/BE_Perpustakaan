@@ -1,16 +1,20 @@
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
+import { authToken, authorizePermission } from "../middleware.js";
+import { Permission } from "../authorization.js";
 
 const prisma = new PrismaClient();
 
 const router = Router();
 
-router.get("/buku", async (req, res) => {
+router.use(authToken);
+
+router.get("/buku", authorizePermission(Permission.BROWSE_BUKU), async (req, res) => {
   const buku = await prisma.buku.findMany();
   res.status(200).json(buku);
 });
 
-router.get("/buku/:id", async (req, res) => {
+router.get("/buku/:id", authorizePermission(Permission.BROWSE_BUKU), async (req, res) => {
   if (isNaN(req.params.id)) {
     res.status(400).json({ message: "ID buku tidak diketahui" });
   } else {
@@ -30,7 +34,7 @@ router.get("/buku/:id", async (req, res) => {
   }
 });
 
-router.post("/buku", async (req, res) => {
+router.post("/buku", authorizePermission(Permission.ADD_BUKU), async (req, res) => {
   const { pengarang_id, penerbit_id, rak_id, judul, tahun_terbit, jumlah, isbn } = req.body;
 
   if (!req.body.pengarang_id || !req.body.penerbit_id || !req.body.rak_id || !req.body.judul || !req.body.tahun_terbit || !req.body.jumlah || !req.body.isbn) {
@@ -41,7 +45,7 @@ router.post("/buku", async (req, res) => {
   }
 });
 
-router.put("/buku/:id", async (req, res) => {
+router.put("/buku/:id", authorizePermission(Permission.EDIT_BUKU), async (req, res) => {
   if (isNaN(req.params.id)) {
     res.status(400).json({ message: "ID tidak diketahui" });
   } else {
@@ -55,7 +59,7 @@ router.put("/buku/:id", async (req, res) => {
   }
 });
 
-router.delete("/buku/:id", async (req, res) => {
+router.delete("/buku/:id", authorizePermission(Permission.DELETE_BUKU), async (req, res) => {
   if (isNaN(req.params.id)) {
     res.status(400).json({ message: "ID tidak di ketahui" });
   } else {
