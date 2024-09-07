@@ -9,7 +9,7 @@ router.get("/pengembalian", async (req, res) => {
   const pengembalian = await prisma.pengembalian.findMany({
     include: {
       Anggota: { select: { nama: true, nis: true } },
-      Petugas: { select: { nama: true } },
+      Users: { select: { nama: true } },
       Peminjaman: { select: { tanggal_pinjam: true } },
     },
   });

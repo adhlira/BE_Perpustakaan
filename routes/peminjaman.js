@@ -1,23 +1,27 @@
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
+import { Permission } from "../authorization.js";
+import { authToken, authorizePermission } from "../middleware.js";
 
 const prisma = new PrismaClient();
 
 const router = Router();
 
-router.get("/peminjaman", async (req, res) => {
-  const peminjaman = await prisma.peminjaman.findMany({ include: { Petugas: { select: { nama: true } }, Anggota: { select: { nama: true, nis: true } }, Detail_Peminjaman: { include: { Buku: { select: { judul: true, isbn: true } } } } } });
+router.use(authToken);
+
+router.get("/peminjaman", authorizePermission(Permission.BROWSE_PEMINJAMAN), async (req, res) => {
+  const peminjaman = await prisma.peminjaman.findMany({ include: { Users: { select: { nama: true } }, Anggota: { select: { nama: true, nis: true } }, Detail_Peminjaman: { include: { Buku: { select: { judul: true, isbn: true } } } } } });
   res.status(200).json(peminjaman);
 });
 
-router.get("/peminjaman/:id", async (req, res) => {
+router.get("/peminjaman/:id", authorizePermission(Permission.BROWSE_PEMINJAMAN), async (req, res) => {
   if (isNaN(req.params.id)) {
     res.status(400).json({ message: "ID buku tidak diketahui" });
   } else {
     const peminjaman = await prisma.peminjaman.findFirst({
       include: {
         Anggota: { select: { nama: true, nis: true } },
-        Petugas: { select: { nama: true } },
+        Users: { select: { nama: true } },
         Detail_Peminjaman: { include: { Buku: { select: { judul: true, isbn: true } } } },
       },
       where: { id: +req.params.id },
@@ -30,19 +34,19 @@ router.get("/peminjaman/:id", async (req, res) => {
   }
 });
 
-router.post("/peminjaman", async (req, res) => {
-  const { anggota_id, petugas_id, tanggal_pinjam, tanggal_kembali, buku_id } = req.body;
+router.post("/peminjaman", authorizePermission(Permission.ADD_PEMINJAMAN), async (req, res) => {
+  const { anggota_id, user_id, tanggal_pinjam, tanggal_kembali, buku_id } = req.body;
 
   const tanggalPinjam = new Date(tanggal_pinjam);
   const tanggalKembali = new Date(tanggal_kembali);
 
-  if (!req.body.anggota_id || !req.body.petugas_id || !req.body.tanggal_pinjam || !req.body.tanggal_kembali || !req.body.buku_id) {
+  if (!req.body.anggota_id || !req.body.user_id || !req.body.tanggal_pinjam || !req.body.tanggal_kembali || !req.body.buku_id) {
     res.status(400).json({ message: "Data tidak lengkap" });
   } else {
     const peminjaman = await prisma.peminjaman.create({
       data: {
         anggota_id: anggota_id,
-        petugas_id: petugas_id,
+        user_id: user_id,
         tanggal_pinjam: tanggalPinjam,
         tanggal_kembali: tanggalKembali,
         Detail_Peminjaman: {
@@ -54,8 +58,8 @@ router.post("/peminjaman", async (req, res) => {
   }
 });
 
-router.put("/peminjaman/:id", async (req, res) => {
-  const { anggota_id, petugas_id, tanggal_pinjam, tanggal_kembali, buku_id } = req.body;
+router.put("/peminjaman/:id", authorizePermission(Permission.EDIT_PEMINJAMAN), async (req, res) => {
+  const { anggota_id, user_id, tanggal_pinjam, tanggal_kembali, buku_id } = req.body;
   if (isNaN(req.params.id)) {
     res.status(400).json({ message: "ID tidak diketahui" });
   } else {
@@ -67,7 +71,7 @@ router.put("/peminjaman/:id", async (req, res) => {
         where: { id: +req.params.id },
         data: {
           anggota_id,
-          petugas_id,
+          user_id,
           tanggal_pinjam,
           tanggal_kembali,
           Detail_Peminjaman: {
@@ -80,7 +84,7 @@ router.put("/peminjaman/:id", async (req, res) => {
   }
 });
 
-router.delete("/peminjaman/:id", async (req, res) => {
+router.delete("/peminjaman/:id", authorizePermission(Permission.DELETE_PEMINJAMAN), async (req, res) => {
   if (isNaN(req.params.id)) {
     res.status(400).json({ message: "ID tidak di ketahui" });
   } else {

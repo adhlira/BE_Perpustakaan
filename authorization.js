@@ -29,6 +29,11 @@ export const Permission = {
   ADD_PENERBIT: "add_penerbit",
   EDIT_PENERBIT: "edit_penerbit",
   DELETE_PENERBIT: "delete_penerbit",
+
+  BROWSE_PEMINJAMAN: "browse_peminjaman",
+  ADD_PEMINJAMAN: "add_peminjaman",
+  EDIT_PEMINJAMAN: "edit_peminjaman",
+  DELETE_PEMINJAMAN: "delete_peminjaman",
 };
 
 export const PermissionAssignment = {
