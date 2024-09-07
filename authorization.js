@@ -24,6 +24,11 @@ export const Permission = {
   ADD_PENGARANG: "add_pengarang",
   EDIT_PENGARANG: "edit_pengarang",
   DELETE_PENGARANG: "delete_pengarang",
+
+  BROWSE_PENERBIT: "browse_penerbit",
+  ADD_PENERBIT: "add_penerbit",
+  EDIT_PENERBIT: "edit_penerbit",
+  DELETE_PENERBIT: "delete_penerbit",
 };
 
 export const PermissionAssignment = {
