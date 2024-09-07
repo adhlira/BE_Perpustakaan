@@ -19,6 +19,11 @@ export const Permission = {
   ADD_BUKU: "add_buku",
   EDIT_BUKU: "edit_buku",
   DELETE_BUKU: "delete_buku",
+
+  BROWSE_PENGARANG: "browse_pengarang",
+  ADD_PENGARANG: "add_pengarang",
+  EDIT_PENGARANG: "edit_pengarang",
+  DELETE_PENGARANG: "delete_pengarang",
 };
 
 export const PermissionAssignment = {
