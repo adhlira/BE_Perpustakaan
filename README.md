@@ -29,7 +29,7 @@ pengembalian buku.
 1. Clone repository ini:
 
     ```sh
-    git clone https://github.com/adhlira/BE_PerpusOnline
+    git clone https://github.com/adhlira/BE_Perpustakaan
     cd nama-repo/backend
     ```
 
